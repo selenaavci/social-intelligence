@@ -1,8 +1,3 @@
-"""Data summary (rule-based) and LLM analysis helpers.
-
-Credentials are resolved through ``src.config`` which reads from
-``st.secrets`` when running on Streamlit Cloud.
-"""
 from __future__ import annotations
 
 import json
