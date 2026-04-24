@@ -1,3 +1,12 @@
+"""Social Pulse AI - Streamlit Cloud entry point.
+
+Deploy:
+  1. Push this ``streamlit/`` folder as the repository root.
+  2. On share.streamlit.io create a new app, set the main file to
+     ``streamlit_app.py``.
+  3. In Settings -> Secrets add ``LLM_API_KEY``, ``LLM_BASE_URL``,
+     ``LLM_MODEL`` (see ``.streamlit/secrets.toml.example``).
+"""
 from __future__ import annotations
 
 import hashlib
@@ -8,7 +17,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from src import pipeline, report
+from src import pipeline
 from src.comparison import MAX_BANKS, MIN_BANKS, build_comparison
 from src.config import DEFAULT_BANK, llm_configured
 from src.data_loader import list_banks, load_all
@@ -17,7 +26,7 @@ from src.pipeline import PipelineResult
 
 
 st.set_page_config(
-    page_title="Social Intelligence Agent",
+    page_title="Social Pulse AI",
     page_icon="🧠",
     layout="wide",
 )
@@ -164,16 +173,6 @@ def render_detailed(result: PipelineResult) -> None:
 
     st.subheader("Rakip Benchmark")
     st.dataframe(result.benchmark, use_container_width=True, hide_index=True)
-
-    st.subheader("Rapor İndir")
-    buffer, filename = report.build_excel_report(result)
-    st.download_button(
-        label=f"Excel raporunu indir ({filename})",
-        data=buffer,
-        file_name=filename,
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        key="detay_report_download",
-    )
 
 
 def render_comparison(comp) -> None:
