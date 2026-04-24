@@ -1,3 +1,8 @@
+"""Data summary (rule-based) and LLM analysis helpers.
+
+Credentials are resolved through ``src.config`` which reads from
+``st.secrets`` when running on Streamlit Cloud.
+"""
 from __future__ import annotations
 
 import json
@@ -48,7 +53,8 @@ def _require_llm() -> None:
     if not config.llm_configured():
         raise RuntimeError(
             "LLM yapılandırılmamış. Streamlit Cloud üzerinde Settings -> Secrets "
-            "bölümüne LLM_API_KEY, LLM_BASE_URL ve LLM_MODEL değerlerini ekleyin. "
+            "bölümüne LLM_API_KEY, LLM_BASE_URL ve LLM_MODEL değerlerini ekleyin "
+            "(lokalde .streamlit/secrets.toml dosyasını kullanın)."
         )
 
 

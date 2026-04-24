@@ -44,7 +44,7 @@ def _cached_load_all(path: str):
     return load_all(path)
 
 
-@st.cache_resource(show_spinner=True)
+@st.cache_resource(show_spinner=False)
 def _cached_pipeline(path: str, bank: str) -> PipelineResult:
     combined, summaries = _cached_load_all(path)
     return pipeline.run(bank, path=path, combined=combined, summaries=summaries)
@@ -360,8 +360,7 @@ with tab_detay:
     if active_bank is None:
         st.info("Bir banka seçin ve Analizi Çalıştır butonuna basın.")
     else:
-        with st.spinner("Pipeline çalışıyor..."):
-            result = _cached_pipeline(data_path, active_bank)
+        result = _cached_pipeline(data_path, active_bank)
         render_detailed(result)
 
 with tab_rakip:
