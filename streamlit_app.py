@@ -17,7 +17,7 @@ from src.pipeline import PipelineResult
 
 
 st.set_page_config(
-    page_title="Social Intelligence Agent,
+    page_title="Social Intelligence Agent",
     page_icon="🧠",
     layout="wide",
 )
