@@ -48,8 +48,7 @@ def _require_llm() -> None:
     if not config.llm_configured():
         raise RuntimeError(
             "LLM yapılandırılmamış. Streamlit Cloud üzerinde Settings -> Secrets "
-            "bölümüne LLM_API_KEY, LLM_BASE_URL ve LLM_MODEL değerlerini ekleyin "
-            "(lokalde .streamlit/secrets.toml dosyasını kullanın)."
+            "bölümüne LLM_API_KEY, LLM_BASE_URL ve LLM_MODEL değerlerini ekleyin. "
         )
 
 
