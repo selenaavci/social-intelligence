@@ -644,15 +644,3 @@ with tab_nutr:
                 "matched_pos": "Yakalanan İfadeler",
             })
             st.dataframe(view, use_container_width=True, hide_index=True)
-
-            with st.expander("Yöntem hakkında"):
-                st.markdown(
-                    "- Sentiment etiketi **Neutral** olan postlar Türkçe pozitif "
-                    "sözlük ve pozitif emoji listesiyle taranır.\n"
-                    "- Negatif sözlük + negatif emoji ile ters yönlü sinyaller "
-                    "puanı düşürür.\n"
-                    "- Bir post **`pos_score >= eşik`** ve `pos_score >= 2x neg_score` "
-                    "koşullarını birlikte sağlarsa gizli pozitif olarak işaretlenir.\n"
-                    "- Sözlükler `streamlit/src/neutral_analysis.py` içinde "
-                    "düzenlenebilir."
-                )
