@@ -32,7 +32,7 @@ def generate_recommendations(ctx: Dict[str, Any]) -> List[str]:
     if anomalies:
         recs.append(
             "Anomali tespit edilen günlerde içerik akışı manuel olarak "
-            "incelenmeli ve olası kriz uyarıları eskalasyon listesine girmeli."
+            "incelenmeli ve olası kriz uyarıları oluşturularak kapsamları genişletilmeli."
         )
     if engagement < peer_engagement:
         recs.append(
