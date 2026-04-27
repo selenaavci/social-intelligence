@@ -42,6 +42,16 @@ def build_comparison(per_bank: List[PipelineResult]) -> ComparisonResult:
     kpi_rows = []
     for r in per_bank:
         row = r.summary.as_dict()
+        # Override summary metrics with filtered analytics so the table
+        # reflects the user's bank-author / ad checkbox choices.
+        sd = r.sentiment_dist
+        row["content"] = int(r.engagement.get("posts", row.get("content", 0)))
+        row["reach"] = int(r.engagement.get("total_reach", row.get("reach", 0)))
+        row["avg_interaction"] = float(r.engagement.get("avg_interaction", row.get("avg_interaction", 0.0)))
+        if not sd.empty:
+            row["pos_share"] = float(sd.get("Positive", 0.0))
+            row["neu_share"] = float(sd.get("Neutral", 0.0))
+            row["neg_share"] = float(sd.get("Negative", 0.0))
         row["anomaly_days"] = r.context.get("anomaly_days", 0)
         row["pain_topics"] = ", ".join(r.context.get("pain_topics", [])[:3])
         row["opportunity_topics"] = ", ".join(r.context.get("opportunity_topics", [])[:3])

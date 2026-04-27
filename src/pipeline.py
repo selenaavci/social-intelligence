@@ -8,6 +8,7 @@ import pandas as pd
 
 from . import analytics, audience, crisis_detection, llm_insights, recommendations, topic_intelligence
 from .data_loader import BankSummary, PathOrBuffer, load_all, load_bank
+from .filters import apply_filters, filter_counts
 
 
 @dataclass
@@ -20,6 +21,7 @@ class PipelineResult:
     sources: pd.DataFrame
     daily: pd.DataFrame
     anomalies: pd.DataFrame
+    anomaly_topics: pd.DataFrame
     viral: pd.DataFrame
     spike_topics: List[Dict]
     topics: pd.DataFrame
@@ -32,6 +34,9 @@ class PipelineResult:
     gap: Dict[str, float]
     data_summary: str
     actions: List[str]
+    filter_stats: Dict[str, int] = field(default_factory=dict)
+    include_bank_authors: bool = True
+    include_ads: bool = True
     context: Dict[str, Any] = field(default_factory=dict)
 
 
@@ -40,8 +45,12 @@ def run(
     path: PathOrBuffer,
     combined: Optional[pd.DataFrame] = None,
     summaries: Optional[pd.DataFrame] = None,
+    include_bank_authors: bool = True,
+    include_ads: bool = True,
 ) -> PipelineResult:
     df, summary = load_bank(bank, path)
+    raw_stats = filter_counts(df, bank)
+    df = apply_filters(df, bank, include_bank_authors, include_ads)
 
     if combined is None or summaries is None:
         combined, summaries = load_all(path)
@@ -51,6 +60,10 @@ def run(
     sources = analytics.source_breakdown(df)
     daily = analytics.daily_volume(df)
     anomalies = crisis_detection.detect_anomalies(df)
+    anomaly_topics = topic_intelligence.anomaly_day_topics(
+        df,
+        anomalies.loc[anomalies.get("is_anomaly", False), "day"] if not anomalies.empty else pd.Series(dtype="datetime64[ns]"),
+    )
     viral = crisis_detection.viral_content(df)
     spike_topics = crisis_detection.negative_spike_topics(df)
     topics = topic_intelligence.topic_breakdown(df)
@@ -91,6 +104,7 @@ def run(
         sources=sources,
         daily=daily,
         anomalies=anomalies,
+        anomaly_topics=anomaly_topics,
         viral=viral,
         spike_topics=spike_topics,
         topics=topics,
@@ -103,5 +117,8 @@ def run(
         gap=gap,
         data_summary=summary_text,
         actions=actions,
+        filter_stats=raw_stats,
+        include_bank_authors=include_bank_authors,
+        include_ads=include_ads,
         context=context,
     )

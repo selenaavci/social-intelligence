@@ -46,3 +46,57 @@ def top_opportunities(df: pd.DataFrame, top_k: int = 5, min_posts: int = TOPIC_M
     if g.empty:
         return g
     return g.sort_values("positive_share", ascending=False).head(top_k).reset_index(drop=True)
+
+
+def anomaly_day_topics(
+    df: pd.DataFrame,
+    anomaly_days: pd.Series,
+    top_k: int = 5,
+) -> pd.DataFrame:
+    """Most-mentioned positive and negative topics on each anomaly day.
+
+    Returns long-form rows with columns: ``day``, ``sentiment``,
+    ``Kategori``, ``count`` ordered by day then count desc within each
+    sentiment.
+    """
+    if df.empty or "Date" not in df.columns or "Kategori" not in df.columns:
+        return pd.DataFrame(columns=["day", "sentiment", "Kategori", "count"])
+
+    days = pd.to_datetime(pd.Series(anomaly_days)).dt.floor("D").unique()
+    if len(days) == 0:
+        return pd.DataFrame(columns=["day", "sentiment", "Kategori", "count"])
+
+    d = df.dropna(subset=["Date"]).copy()
+    d["day"] = d["Date"].dt.floor("D")
+    d = d[d["day"].isin(days)]
+    if d.empty:
+        return pd.DataFrame(columns=["day", "sentiment", "Kategori", "count"])
+
+    exploded = d.assign(
+        Kategori=d["Kategori"].astype(str).str.split(r"[,;]")
+    ).explode("Kategori")
+    exploded["Kategori"] = exploded["Kategori"].str.strip()
+    exploded = exploded[exploded["Kategori"].ne("").fillna(False)]
+    exploded = exploded[~exploded["Kategori"].str.lower().isin(["nan", "none", "unknown"])]
+    if exploded.empty:
+        return pd.DataFrame(columns=["day", "sentiment", "Kategori", "count"])
+
+    rows = []
+    for sentiment in ("Positive", "Negative"):
+        sub = exploded[exploded["Sentiment"] == sentiment]
+        if sub.empty:
+            continue
+        counts = (
+            sub.groupby(["day", "Kategori"]).size()
+            .reset_index(name="count")
+            .sort_values(["day", "count"], ascending=[True, False])
+        )
+        counts["sentiment"] = sentiment
+        counts = counts.groupby("day", group_keys=False).head(top_k)
+        rows.append(counts[["day", "sentiment", "Kategori", "count"]])
+
+    if not rows:
+        return pd.DataFrame(columns=["day", "sentiment", "Kategori", "count"])
+    return pd.concat(rows, ignore_index=True).sort_values(
+        ["day", "sentiment", "count"], ascending=[True, True, False]
+    ).reset_index(drop=True)
