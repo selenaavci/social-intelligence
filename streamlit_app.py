@@ -1,12 +1,3 @@
-"""Social Pulse AI - Streamlit Cloud entry point.
-
-Deploy:
-  1. Push this ``streamlit/`` folder as the repository root.
-  2. On share.streamlit.io create a new app, set the main file to
-     ``streamlit_app.py``.
-  3. In Settings -> Secrets add ``LLM_API_KEY``, ``LLM_BASE_URL``,
-     ``LLM_MODEL`` (see ``.streamlit/secrets.toml.example``).
-"""
 from __future__ import annotations
 
 import hashlib
@@ -30,7 +21,7 @@ from src.pipeline import PipelineResult
 
 
 st.set_page_config(
-    page_title="Social Pulse AI",
+    page_title="Social Intelligence Agent",
     page_icon="🧠",
     layout="wide",
 )
